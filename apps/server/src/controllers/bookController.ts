@@ -11,6 +11,19 @@ const bookService = new BookService();
  *   get:
  *     summary: Get all books
  *     tags: [Books]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: The page number for pagination (1-indexed).
+ *       - in: query
+ *         name: perPage
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: The number of books to return per page.
  *     responses:
  *       200:
  *         description: List of books
@@ -18,9 +31,10 @@ const bookService = new BookService();
  *         description: Internal server error
  */
 
-export const getAllBooks = async (_req: Request, res: Response) => {
+export const getAllBooks = async (req: Request, res: Response) => {
   try {
-    const books = await bookService.getAllBooks();
+    const query: any = req.query;
+    const books = await bookService.getAllBooks(query);
     return res.status(200).json(books);
   } catch (error) {
     return res.status(500).json({ error: "Internal server error" });

@@ -2,7 +2,7 @@ import { data } from "../utils/data";
 import { Book } from "../entities/Book";
 import { AppDataSource } from "../utils/connectionDB";
 import { Repository } from "typeorm";
-import { BookInputs, BookPurchase } from "utils/interfaces";
+import { BookInputs, BookPurchase, BookQuery } from "utils/interfaces";
 import { Transactions } from "../entities/Transaction";
 
 export class BookService {
@@ -14,8 +14,14 @@ export class BookService {
     this.transactionRepository = AppDataSource.getRepository(Transactions);
   }
 
-  getAllBooks(): Promise<Book[]> {
-    return this.bookRepository.find({ relations: ["transactions"] });
+  getAllBooks(query: BookQuery): Promise<Book[]> {
+    const { page, perPage } = query;
+    const skipItems = (Number(page) - 1) * Number(perPage);
+    return this.bookRepository.find({
+      relations: ["transactions"],
+      skip: skipItems,
+      take: Number(perPage),
+    });
   }
 
   getBook(id: string): Promise<Book | null> {
